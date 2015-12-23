@@ -11,7 +11,7 @@ TARGET=stepperxy
 
 
 
-_OBJ = blinkslave.o
+_OBJ = stepperxy.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 
 

@@ -1,7 +1,7 @@
 .origin 0
 .entrypoint START
 
-#include "blinkslave.hp"
+#include "stepperxy.hp"
 
 #define GPIO1 0x4804c000
 #define GPIO_CLEARDATAOUT 0x190

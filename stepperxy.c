@@ -88,7 +88,7 @@ int main (void)
  
     tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
     
-    printf("\nINFO: Starting %s example.\r\n", "blinkslave");
+    printf("\nINFO: Starting %s example.\r\n", "stepperxy");
     /* Initialize the PRU */
     prussdrv_init ();		
     // printf("sizof segm = %d\n", sizeof(segm));
@@ -115,7 +115,7 @@ int main (void)
 		pruDataMem_seg[i].interval_x= TIMEBASE/seg[i].puls_x;
 		pruDataMem_seg[i].puls_y=seg[i].puls_y;
 		pruDataMem_seg[i].interval_y= TIMEBASE/seg[i].puls_y;	
-		printf("%d\n", seg[i].status);
+	//	printf("%d\n", seg[i].status);
 	}
 	// pruDataMem_seg[10].status=STOP;
 	
@@ -123,7 +123,7 @@ int main (void)
 
     /* Execute example on PRU */
     printf("\tINFO: Executing example.\r\n");
-    prussdrv_exec_program (PRU_NUM, "./blinkslave.bin");
+    prussdrv_exec_program (PRU_NUM, "./stepperxy.bin");
 	while(r < 10){
 		r=IntData[2];
 		// printf("%d\n", r);
