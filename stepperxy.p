@@ -64,104 +64,93 @@ START:
 	
 	
 BEGIN:
-    LBCO SEGM, CONST_PRUDRAM, MEM_POS, SEGM_SIZE						 //1
-	//QBLE NONEWDATA, MEM_POS, BLOCKSIZE 
-	MOV MEM_POS, SEGM_SIZE
+    LBCO SEGM, CONST_PRUDRAM, MEM_POS, SEGM_SIZE					// 7
+	MOV MEM_POS, SEGM_SIZE											// 1
 	
-    MOV r2, 1<<STEPX
-    MOV r3, GPIO1 | GPIO_CLEARDATAOUT
-    SBBO r2, r3, 0, 4
+	MOV r2, 1<<STEPX												// 1
+    MOV r3, GPIO1 | GPIO_CLEARDATAOUT								// 1
+    SBBO r2, r3, 0, 4												// 3
 
-NONEWDATA:
-	QBBC EXIT, STATUS, 0	  // stoppen als status is -stop-			// 1
-//	add MEM_POS, MEM_POS, SEGM_SIZE  // volgende mempositie					// 1
-    SUB INTERVAL_X, INTERVAL_X, PULSEWIDTH
-    SUB INTERVAL_Y, INTERVAL_Y, PULSEWIDTH
+	QBBC EXIT, STATUS, 0	  // stoppen als status is -stop-		// 1
+    SUB INTERVAL_X, INTERVAL_X, PULSEWIDTH							// 1
+    SUB INTERVAL_Y, INTERVAL_Y, PULSEWIDTH							// 1
 	
-	ADD X_POS, COUNTER, INTERVAL_X										// 1
-	ADD X_OFF, X_POS, PULSEWIDTH					// 1
-	ADD Y_POS, COUNTER, INTERVAL_Y					// 1
-	ADD Y_OFF, Y_POS, PULSEWIDTH					// 1
+	ADD X_POS, COUNTER, INTERVAL_X									// 1
+	ADD X_OFF, X_POS, PULSEWIDTH									// 1
+	ADD Y_POS, COUNTER, INTERVAL_Y									// 1
+	ADD Y_OFF, Y_POS, PULSEWIDTH									// 1
+
+	ADD BLOCKPOS, BLOCKPOS, 1										// 1
+	SBCO BLOCKPOS, CONST_PRUDRAM, 8, 4								// 3
+	SBCO MEM_POS, CONST_PRUDRAM, 12, 4								// 3
 	
-	ADD BLOCKPOS, BLOCKPOS, 1
-	SBCO BLOCKPOS, CONST_PRUDRAM, 8, 4
-	SBCO MEM_POS, CONST_PRUDRAM, 12, 4
-	
-    QBBC REVERSE_X, STATUS, X_REVERSE 
-	MOV r2, 1<<DIRX									// 1
-    MOV r3, GPIO1 | GPIO_SETDATAOUT					// 1
-    SBBO r2, r3, 0, 4								// 3
-	QBA DONE_X										// 1
+    QBBC REVERSE_X, STATUS, X_REVERSE 								// 1
+	MOV r2, 1<<DIRX													// 1
+    MOV r3, GPIO1 | GPIO_SETDATAOUT									// 1
+    SBBO r2, r3, 0, 4												// 3
+	QBA DONE_X														// 1
 REVERSE_X:
-	MOV r2, 1<<DIRX									// 1
-    MOV r3, GPIO1 | GPIO_CLEARDATAOUT				// 1
-    SBBO r2, r3, 0, 4								// 3
+	MOV r2, 1<<DIRX													// 1
+    MOV r3, GPIO1 | GPIO_CLEARDATAOUT								// 1
+    SBBO r2, r3, 0, 4												// 3
 
 DONE_X:
-    QBBC REVERSE_Y, STATUS, Y_REVERSE 				// 1
-	MOV r2, 1<<DIRY									// 1
-    MOV r3, GPIO1 | GPIO_SETDATAOUT					// 1
-    SBBO r2, r3, 0, 4								// 3
-	QBA BLINK										// 1
+    QBBC REVERSE_Y, STATUS, Y_REVERSE 								// 1
+	MOV r2, 1<<DIRY													// 1
+    MOV r3, GPIO1 | GPIO_SETDATAOUT									// 1
+    SBBO r2, r3, 0, 4												// 3
+	QBA BLINK														// 1
 REVERSE_Y:					
-	MOV r2, 1<<DIRY									// 1
-    MOV r3, GPIO1 | GPIO_CLEARDATAOUT				// 1
-    SBBO r2, r3, 0, 4								// 1
-
-	
-	
+	MOV r2, 1<<DIRY													// 1
+    MOV r3, GPIO1 | GPIO_CLEARDATAOUT								// 1
+    SBBO r2, r3, 0, 4												// 3
 	
 BLINK:
-	ADD COUNTER, COUNTER, 1							// 1
+	ADD COUNTER, COUNTER, 1											// 1
 
 LOOPX:
-	QBNE LOOPX1, COUNTER, X_POS						
+	QBNE LOOPX1, COUNTER, X_POS										// 1
 	
-    MOV r2, 1<<STEPX
-    MOV r3, GPIO1 | GPIO_SETDATAOUT
-    SBBO r2, r3, 0, 4
-	
+    MOV r2, 1<<STEPX												// 1
+	MOV r3, GPIO1 | GPIO_SETDATAOUT									// 1
+    SBBO r2, r3, 0, 4												// 3
 	
 LOOPX1:
-
 	
-	QBNE LOOPX2, COUNTER, X_OFF
+	QBNE LOOPX2, COUNTER, X_OFF										// 1
 	
-	MOV r2, 1<<STEPX
-    MOV r3, GPIO1 | GPIO_CLEARDATAOUT
-    SBBO r2, r3, 0, 4
+	MOV r2, 1<<STEPX												// 1
+    MOV r3, GPIO1 | GPIO_CLEARDATAOUT								// 1
+    SBBO r2, r3, 0, 4												// 3
 	
-	ADD X_POS, COUNTER, INTERVAL_X
-	ADD X_OFF, X_POS, PULSEWIDTH
+	ADD X_POS, COUNTER, INTERVAL_X									// 1
+	ADD X_OFF, X_POS, PULSEWIDTH									// 1
 	
 LOOPX2:
 
-LOOPY:
-	QBNE LOOPY1, COUNTER, Y_POS
+LOOPY:							
+	QBNE LOOPY1, COUNTER, Y_POS										// 1
 	
-    MOV r2, 1<<STEPY
-    MOV r3, GPIO1 | GPIO_SETDATAOUT
-    SBBO r2, r3, 0, 4
-	
+    MOV r2, 1<<STEPY												// 1
+    MOV r3, GPIO1 | GPIO_SETDATAOUT									// 1
+    SBBO r2, r3, 0, 4												// 3
 	
 LOOPY1:
-
 	
-	QBNE LOOPY2, COUNTER, Y_OFF
+	QBNE LOOPY2, COUNTER, Y_OFF										// 1
 	
-	MOV r2, 1<<STEPY
-    MOV r3, GPIO1 | GPIO_CLEARDATAOUT
-    SBBO r2, r3, 0, 4
-	
-	ADD Y_POS, COUNTER, INTERVAL_Y
-	ADD Y_OFF, Y_POS, PULSEWIDTH
-	
+	MOV r2, 1<<STEPY												// 1
+    MOV r3, GPIO1 | GPIO_CLEARDATAOUT								// 1
+    SBBO r2, r3, 0, 4												// 3
+					
+	ADD Y_POS, COUNTER, INTERVAL_Y									// 1
+	ADD Y_OFF, Y_POS, PULSEWIDTH									// 1
  
-	SUB PULSE_Y, PULSE_Y, 1
-	QBEQ BEGIN, PULSE_Y, 0
+	SUB PULSE_Y, PULSE_Y, 1											// 1
+	QBEQ BEGIN, PULSE_Y, 0											// 1
 	
 LOOPY2:
-	QBA BLINK
+	QBA BLINK														// 1
 	
  
 

@@ -22,12 +22,13 @@
 
 #define AM33XX
 #define PAUZE 1000000
+#define PRUCLOCK 2e8
 
 #define RUN 1
 #define REVERSE_X 2
 #define REVERSE_Y 4
 #define STOP 0
-#define PULSEWIDTH 300
+#define PULSEWIDTH 3000
 
 
 #define TIMEBASE 3.3326e7
@@ -170,11 +171,11 @@ static int LOCAL_exampleInit ()
     pruDataMem_seg = (segm*) pruDataMem + 1 ;  // reserveer memory voor header
 	
 
-	pruDataMem_seg[0].status = RUN | REVERSE_X;
-	pruDataMem_seg[0].puls_x=5;
-    pruDataMem_seg[0].interval_x= TIMEBASE/pruDataMem_seg[0].puls_x;
-    pruDataMem_seg[0].puls_y=8;
-    pruDataMem_seg[0].interval_y= TIMEBASE/pruDataMem_seg[0].puls_y;
+	// pruDataMem_seg[0].status = RUN | REVERSE_X;
+	// pruDataMem_seg[0].puls_x=5;
+    // pruDataMem_seg[0].interval_x= TIMEBASE/pruDataMem_seg[0].puls_x;
+    // pruDataMem_seg[0].puls_y=8;
+    // pruDataMem_seg[0].interval_y= TIMEBASE/pruDataMem_seg[0].puls_y;
 	
 
 
@@ -182,14 +183,18 @@ static int LOCAL_exampleInit ()
 }
 
 int rand_segm(){
-	int i;
+	int i, px, py, fx, fy, fn;
 	for (i = 0;i < SEGNUMBER; i++){
-
+		px=2+i;
+		py=SEGNUMBER+3-i;
+		fn=PRUCLOCK-px*22-py*24-46;
+		fx=fn/(5*px)-PULSEWIDTH;
+		fy=fn/(5*py)-PULSEWIDTH;
 		seg[i].status = RUN | REVERSE_X | REVERSE_Y;
-		seg[i].puls_x=2+i;
-		seg[i].interval_x= TIMEBASE/seg[i].puls_x;
-		seg[i].puls_y=SEGNUMBER+3-i;
-		seg[i].interval_y= TIMEBASE/seg[i].puls_y;
+		seg[i].puls_x=px;
+		seg[i].interval_x= fx;
+		seg[i].puls_y=py;
+		seg[i].interval_y= fy;
 		
 	}
 	seg[i].status = STOP;
