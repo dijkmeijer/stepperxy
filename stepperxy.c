@@ -27,12 +27,12 @@
 #define REVERSE_X 2
 #define REVERSE_Y 4
 #define STOP 0
-#define PULSEWIDTH 30000
+#define PULSEWIDTH 300
 
 
-#define TIMEBASE 3.33e7
+#define TIMEBASE 3.3326e7
 #define BLOCKSIZE 15
-
+#define SEGNUMBER 3600
 
 typedef struct  {
 	uint32_t status;
@@ -71,7 +71,7 @@ int rand_segm();
 
 static void *pruDataMem;
 static segm *pruDataMem_seg;
-segm seg[200];
+segm seg[SEGNUMBER+1];
 int count;
 static int *IntData;
 /*****************************************************************************
@@ -81,7 +81,7 @@ static int *IntData;
 int main (void)
 {
     unsigned int ret;
-	int i, r, r_old;
+	int  r, r_old;
 	
 
 	
@@ -109,29 +109,33 @@ int main (void)
  
     rand_segm();
  	
-	for(i=0;i<BLOCKSIZE;i++){
-		pruDataMem_seg[i].status=seg[i].status;
-		pruDataMem_seg[i].puls_x=seg[i].puls_x;
-		pruDataMem_seg[i].interval_x= TIMEBASE/seg[i].puls_x;
-		pruDataMem_seg[i].puls_y=seg[i].puls_y;
-		pruDataMem_seg[i].interval_y= TIMEBASE/seg[i].puls_y;	
-	//	printf("%d\n", seg[i].status);
-	}
-	// pruDataMem_seg[10].status=STOP;
+
+		pruDataMem_seg[0].status=seg[0].status;
+		pruDataMem_seg[0].puls_x=seg[0].puls_x;
+		pruDataMem_seg[0].interval_x= TIMEBASE/seg[0].puls_x;
+		pruDataMem_seg[0].puls_y=seg[0].puls_y;
+		pruDataMem_seg[0].interval_y= TIMEBASE/seg[0].puls_y;	
+
 	
 	r=r_old=0;
 
     /* Execute example on PRU */
     printf("\tINFO: Executing example.\r\n");
     prussdrv_exec_program (PRU_NUM, "./stepperxy.bin");
-	while(r < 10){
+
+
+	while(r < SEGNUMBER){
 		r=IntData[2];
 		// printf("%d\n", r);
-		if(r!=r_old) {
-			if(r%5==0)
-			printf("%d\n", r);
-			r_old=r;
+		if( r != r_old ){		
+				printf("%4.2f %% \n", (r*100.0/SEGNUMBER));	
+				pruDataMem_seg[0].status=seg[r].status;
+				pruDataMem_seg[0].puls_x=seg[r].puls_x;
+				pruDataMem_seg[0].interval_x= TIMEBASE/seg[r].puls_x;
+				pruDataMem_seg[0].puls_y=seg[r].puls_y;
+				pruDataMem_seg[0].interval_y= TIMEBASE/seg[r].puls_y;
 
+			r_old=r;
 		}
 	}
 		
@@ -141,7 +145,7 @@ int main (void)
     prussdrv_pru_wait_event (PRU_EVTOUT_0);
     printf("\tINFO: PRU completed transfer.\r\n");
     prussdrv_pru_clear_event (PRU0_ARM_INTERRUPT);
-	printf("%d %d %d\n", IntData[0],IntData[1],IntData[2]);
+//	printf("%d %d %d\n", IntData[0],IntData[1],IntData[2]);
     /* Disable PRU and close memory mapping*/
     prussdrv_pru_disable (PRU_NUM);
     prussdrv_exit ();
@@ -161,7 +165,7 @@ static int LOCAL_exampleInit ()
     prussdrv_map_prumem (PRUSS0_PRU0_DATARAM, &pruDataMem);
 	IntData = (int*)pruDataMem;
 	IntData[0] = PULSEWIDTH;
-	IntData[1] = BLOCKSIZE*sizeof(segm);
+	IntData[1] = 2*sizeof(segm);
 	IntData[2] = BlockPos;
     pruDataMem_seg = (segm*) pruDataMem + 1 ;  // reserveer memory voor header
 	
@@ -179,16 +183,17 @@ static int LOCAL_exampleInit ()
 
 int rand_segm(){
 	int i;
-	for (i = 0;i < 199; i++){
+	for (i = 0;i < SEGNUMBER; i++){
 
 		seg[i].status = RUN | REVERSE_X | REVERSE_Y;
 		seg[i].puls_x=2+i;
 		seg[i].interval_x= TIMEBASE/seg[i].puls_x;
-		seg[i].puls_y=206-i;
+		seg[i].puls_y=SEGNUMBER+3-i;
 		seg[i].interval_y= TIMEBASE/seg[i].puls_y;
 		
 	}
-	seg[10].status = STOP;
+	seg[i].status = STOP;
+	//seg[11].status = STOP;
 	
 	return 0;
 }
